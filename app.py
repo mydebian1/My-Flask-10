@@ -13,7 +13,7 @@ app = Flask (__name__)
 CORS(app)
 
 # Point SQLAlchemy to your SQLite database
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////home/iotexpert/Documents/web-dev/python/my-flask-10/database/myimab.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////Users/shahkhan/Documents/Python/creativekhan/My-Flask-10/database/myimab.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize DB

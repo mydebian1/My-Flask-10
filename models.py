@@ -7,10 +7,6 @@ class Employee(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
     role = db.Column(db.String(20), nullable=False, default="guest")
-    
-    def __repr__(self):
-        return f"<Employee {self.username}>"
-    
 
     def to_dict(self):
         return {
@@ -21,6 +17,10 @@ class Employee(db.Model):
             "password": self.password,
             "role": self.role
         }
+    
+    @classmethod
+    def to_dict_list(cls, employees):
+        return [employee.to_dict() for employee in employees]
     
 class Payroll(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,9 +35,6 @@ class Payroll(db.Model):
     early = db.Column(db.Integer, nullable=False)
     bonus1 = db.Column(db.Integer, nullable=False)
     bonus2 = db.Column(db.Integer, nullable=False)
-    
-    def __repr__(self):
-        return f"<Employee {self.username}>"
     
 
     def to_dict(self):
@@ -58,4 +55,4 @@ class Payroll(db.Model):
 
     @classmethod
     def to_dict_list(cls, payrolls):
-        return [emp.to_dict() for emp in payrolls]
+        return [payroll.to_dict() for payroll in payrolls]
