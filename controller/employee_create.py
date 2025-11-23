@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from crud.create import create_employee_crud
+from crud.employee_create import create_employee_crud
 from models import Employee
 
 create_bp = Blueprint("create_bp", __name__, url_prefix="/employee")

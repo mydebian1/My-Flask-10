@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from controller.create import get_employee_by_username
-from crud.delete import delete_employee_crud
+from controller.employee_create import get_employee_by_username
+from crud.employee_delete import delete_employee_crud
 
 delete_bp = Blueprint("delete_bp", __name__, url_prefix="/employee")
 

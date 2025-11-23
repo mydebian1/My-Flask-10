@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from crud.get import get_employee_by_username, get_all_employee_crud
+from crud.employee_get import get_employee_by_username, get_all_employee_crud
 from models import Employee
 
 get_bp = Blueprint("get_bp", __name__, url_prefix="/employee")

@@ -1,5 +1,5 @@
 from database import db
-from controller.create import get_employee_by_username
+from controller.employee_create import get_employee_by_username
 
 def update_employee_crud(name, username, email, password, role):
     employee = get_employee_by_username(username)

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from crud.update import update_employee_crud
+from crud.employee_update import update_employee_crud
 
 update_bp = Blueprint("update_bp", __name__, url_prefix="/employee")
 
