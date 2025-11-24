@@ -1,12 +1,8 @@
 from flask import Blueprint, request, jsonify
 from crud.payroll_create import create_payroll_crud
-from models import Payroll
+from utils.utils import get_payroll_by_username
 
 payroll_create_bp = Blueprint("payroll_create_bp", __name__, url_prefix="/payroll")
-
-def get_payroll_by_username(batch_name, staff_id):
-    payroll = Payroll.query.filter_by(batch_name=batch_name, staff_id=staff_id).first()
-    return payroll
 
 @payroll_create_bp.route('/create', methods = ["POST"])
 def create_payroll():
@@ -38,11 +34,6 @@ def create_payroll():
             "code": "Payroll_Already_Exist",
             "message": f"This {batch_name} and {staff_id} is already exists, Please try another one"
         })
-    
-
-
-    
-
     
     new_payroll = create_payroll_crud (
         batch_name = batch_name,

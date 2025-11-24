@@ -1,12 +1,8 @@
 from flask import Blueprint, request, jsonify
 from crud.employee_create import create_employee_crud
-from models import Employee
+from utils.utils import get_employee_by_username
 
 create_bp = Blueprint("create_bp", __name__, url_prefix="/employee")
-
-def get_employee_by_username(username):
-    employee = Employee.query.filter_by(username=username).first()
-    return employee
 
 @create_bp.route("/create", methods=["POST"])
 def create_employee():

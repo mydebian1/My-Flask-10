@@ -8,13 +8,17 @@ from controller.employee_delete import delete_bp
 from controller.employee_get import get_bp
 
 from controller.payroll_create import payroll_create_bp
+from controller.payroll_update import payroll_update_bp
+from controller.payroll_delete import payroll_delete_bp
+from controller.payroll_get import payroll_get_bp
 
 app = Flask (__name__)
 CORS(app)
 
 # Point SQLAlchemy to your SQLite database
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////Users/shahkhan/Documents/Python/creativekhan/My-Flask-10/database/myimab.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///C:/Users/Iqbal Hussain/Documents/Flask SQLAchemy/My-Flask-10/database/myimab.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
 
 # Initialize DB
 init_db(app)
@@ -27,6 +31,10 @@ app.register_blueprint(get_bp)
 
 #Register Payroll Blueprints
 app.register_blueprint(payroll_create_bp)
+app.register_blueprint(payroll_update_bp)
+app.register_blueprint(payroll_delete_bp)
+app.register_blueprint(payroll_get_bp)
+
 
 @app.route("/")
 def index():
