@@ -16,9 +16,8 @@ app = Flask (__name__)
 CORS(app)
 
 # Point SQLAlchemy to your SQLite database
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///C:/Users/Iqbal Hussain/Documents/Flask SQLAchemy/My-Flask-10/database/myimab.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:iqbal123123@localhost:5432/myimab'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize DB
 init_db(app)

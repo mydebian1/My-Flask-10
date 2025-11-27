@@ -1,13 +1,16 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, Flask, request, jsonify
 from crud.payroll_get import get_payroll_by_username, get_all_payroll_crud
 from models import Employee
 
 payroll_get_bp = Blueprint("payroll_get_bp", __name__, url_prefix="/payroll")
 
+app = Flask(__name__)
+
 @payroll_get_bp.route("/byusername", methods = ["GET"])
 def get_payroll_username():
 
     data = request.json
+    app.logger.info(f"Data: {data}")
     batch_name = data.get("batch_name")
     staff_id = data.get("staff_id")
 

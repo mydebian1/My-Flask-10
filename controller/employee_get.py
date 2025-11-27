@@ -1,13 +1,17 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, Flask, request, jsonify
 from crud.employee_get import get_employee_by_username, get_all_employee_crud
 from models import Employee
 
 get_bp = Blueprint("get_bp", __name__, url_prefix="/employee")
 
+app = Flask (__name__)
+
 @get_bp.route("/byusername", methods = ["GET"])
 def get_employee_username():
 
     data = request.json
+    app.logger.info(f"Data: {data}")
+
     username = data.get("username")
 
     if not username:

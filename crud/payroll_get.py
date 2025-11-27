@@ -1,6 +1,7 @@
 from database import db
 from controller.payroll_create import get_payroll_by_username
-from models import Employee
+from models import Payroll
+
 
 def get_payroll_username_crud(batch_name, staff_id):
     try: 
@@ -15,7 +16,7 @@ def get_payroll_username_crud(batch_name, staff_id):
 
 def get_all_payroll_crud():
     try:  
-        get_payroll = Employee.query.all()
+        get_payroll = Payroll.query.all()
         db.session.commit()
         return get_payroll
     

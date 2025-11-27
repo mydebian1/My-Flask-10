@@ -1,5 +1,7 @@
 from database import db
 from models import Employee
+from sqlalchemy.exc import IntegrityError
+
 
 def create_employee_crud(name, email, username, password, role):
     try:
@@ -15,7 +17,9 @@ def create_employee_crud(name, email, username, password, role):
         db.session.commit()
 
         return create_employee
-        
-    except Exception as error:
-        print(f"error:{error}")
-        return error
+
+    except IntegrityError:
+        raise
+
+    except Exception:
+        raise

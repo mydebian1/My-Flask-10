@@ -1,5 +1,7 @@
 from database import db
 from controller.employee_create import get_employee_by_username
+from sqlalchemy.exc import IntegrityError
+
 
 def update_employee_crud(name, username, email, password, role):
     employee = get_employee_by_username(username)
@@ -24,7 +26,8 @@ def update_employee_crud(name, username, email, password, role):
 
         return employee
 
-
-    except Exception as e:
-        print(f"error: {e}")
-        return e
+    except IntegrityError:
+        raise
+    
+    except Exception:
+        raise

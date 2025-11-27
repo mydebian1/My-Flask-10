@@ -1,5 +1,7 @@
 from database import db
 from controller.payroll_create import get_payroll_by_username
+from sqlalchemy.exc import IntegrityError
+
 
 def update_payroll_crud(current_batch_name, current_staff_id, batch_name, staff_id, basic_salary, hourly_rate, monthly_hours, worked_hours, late, leaves, early, bonus1, bonus2):
     payroll = get_payroll_by_username(current_batch_name, current_staff_id)
@@ -45,9 +47,11 @@ def update_payroll_crud(current_batch_name, current_staff_id, batch_name, staff_
 
         return payroll
     
-    except Exception as error:
-        print(f"Error: {error}")
-        return error
+    except IntegrityError:
+        raise
+    
+    except Exception:
+        raise
 
 
 

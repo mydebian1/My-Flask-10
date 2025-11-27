@@ -24,8 +24,8 @@ class Employee(db.Model):
     
 class Payroll(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    staff_id = db.Column(db.Integer, db.ForeignKey('staff_id'), nullable=False )
-    batch_name = db.Column(db.String(20), nullable=False)
+    staff_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=False )
+    batch_name = db.Column(db.String(20), unique=True, nullable=False)
     basic_salary = db.Column(db.Integer, nullable=False)
     hourly_rate = db.Column(db.Integer, nullable=False)
     monthly_hours = db.Column(db.Integer, nullable=False)

@@ -1,5 +1,6 @@
 from database import db
 from models import Employee
+from sqlalchemy.exc import IntegrityError
 
 def delete_employee_crud(username):
     try:
@@ -9,7 +10,9 @@ def delete_employee_crud(username):
         db.session.commit()
 
         return delete_query
+    
+    except IntegrityError:
+        raise
         
-    except Exception as error:
-        print(f"error:{error}")
-        return error
+    except Exception:
+        raise

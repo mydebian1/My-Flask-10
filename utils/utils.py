@@ -6,5 +6,5 @@ def get_employee_by_username(username):
     return employee
 
 def get_payroll_by_username(batch_name, staff_id):
-    payroll = Payroll.query.filter_by(batch_name=batch_name, staff_id=staff_id).first()
+    payroll = Payroll.query.filter_by(staff_id=staff_id, batch_name=batch_name).first()
     return payroll
