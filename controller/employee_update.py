@@ -1,7 +1,8 @@
 from flask import Blueprint, Flask, request, jsonify
 from crud.employee_update import update_employee_crud
+from utils.utils import get_employee_by_username
 from sqlalchemy.exc import IntegrityError
-
+from schemas.employee import UpdateEmployeeRequest, EmployeeResponse
 
 update_bp = Blueprint("update_bp", __name__, url_prefix="/employee")
 
@@ -9,49 +10,48 @@ app = Flask(__name__)
 
 @update_bp.route("/update", methods=["PUT"])
 def update_employee():
-    data = request.json
+    data = UpdateEmployeeRequest(request.json)
     app.logger.info(f"Data: {data}")
 
-    try:
-        username = data.get("username")
-        name = data.get("name")
-        email = data.get("email")
-        role = data.get("role")
-        password = data.get("password")
-
-        if not username:
-            return jsonify({
-                "error": "Username is required"
+    if not data.has_username():
+        return jsonify({
+            "code": "USERNAME_REQUIRED", 
+            "error": "Username Required"
             }), 400
 
-        try:
-            employee = update_employee_crud(username=username, name=name, email=email, password=password, role=role)
-            
-            if not employee:
-                return jsonify({
-                    "code": "USER_NOT_EXIST",
-                    "message": f"This {username} Doesn't Exist" 
-                }), 403
+    if not data.has_any_updates():
+        return jsonify({
+            "code": "DATA_MISSING", 
+            "error": "Required fields for data update not provided"
+            }), 400
+    
+    employee = get_employee_by_username(data.username)
 
-        except IntegrityError as error:
-            app.logger.error(f"Integrity Error Occured: {error}")
-            return jsonify({
-                "CODE":"Integrity_ERROR_OCCURED",
-                "message":f"Integrity error occured for '{username}' creation, please try again {error}"
-            })
-        
+    if not employee:
+        return jsonify({
+            "code": "EMPLOYEE_NOT_FOUND", 
+            "error": "Required fields for data update not provided"
+        }), 404
 
-        if employee:
-            return jsonify({
-                "code": "Employee_Updated",
-                "message": f"Employee {username} updated successfully"
-            })
+    try:
+        employee = update_employee_crud(username=data.username, name=data.name, password=data.password, role=data.role, email=data.email)
+
+        return jsonify({
+            "code": "Employee_Updated",
+            "data": EmployeeResponse(employee).to_dict()
+        }), 403
+
+    except IntegrityError as error:
+        app.logger.error(f"Integrity Error Occured: {error}")
+        return jsonify({
+            "CODE":"Integrity_ERROR_OCCURED",
+            "message":f"Integrity error occured for '{data.username}' creation, please try again {error}"
+        })
         
-    except Exception as error:
-        app.logger.error(f"Exceptional Error Occured: {error}")
+    except Exception:
         return jsonify({
             "CODE":"EXCEPTIONAL_ERROR_OCCURED",
-            "message":f"Exceptional error occured for '{username}' creation, please try again"
+            "message":f"Exceptional error occured for '{data.username}' creation, please try again"
         })
     
 

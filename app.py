@@ -1,6 +1,7 @@
 from flask import Flask
 from database import init_db
 from flask_cors import CORS
+import logging
 
 from controller.employee_create import create_bp
 from controller.employee_update import update_bp
@@ -14,6 +15,7 @@ from controller.payroll_get import payroll_get_bp
 
 app = Flask (__name__)
 CORS(app)
+app.logger.setLevel(logging.INFO)
 
 # Point SQLAlchemy to your SQLite database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:iqbal123123@localhost:5432/myimab'
