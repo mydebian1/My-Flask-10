@@ -1,6 +1,7 @@
 from flask import Blueprint, Flask, request, jsonify
 from crud.employee_get import get_employee_by_username, get_all_employee_crud
 from models import Employee
+from schemas.employee import EmployeeResponse, EmployeeListResponse
 
 get_bp = Blueprint("get_bp", __name__, url_prefix="/employee")
 
@@ -26,7 +27,7 @@ def get_employee_username():
 
     try:
         if employee:
-            return employee.to_dict()
+            return EmployeeResponse(employee).to_dict()
         
         else:
             return jsonify({
@@ -51,7 +52,7 @@ def get_all_employees():
         get_employees =  get_all_employee_crud()
 
         if get_employees:
-            return Employee.to_dict_list(get_employees)
+            return EmployeeListResponse.build(get_employees)
         
         else:
             return {

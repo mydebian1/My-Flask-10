@@ -2,7 +2,7 @@ from flask import Blueprint, Flask, request, jsonify
 from crud.payroll_create import create_payroll_crud
 from utils.utils import get_payroll_by_username
 from sqlalchemy.exc import IntegrityError
-from schemas.payroll import CreatePayrollRequest, PayrollResponse, PayrollListResponse
+from schemas.payroll import CreatePayrollRequest, PayrollResponse
 
 payroll_create_bp = Blueprint("payroll_create_bp", __name__, url_prefix="/payroll")
 
@@ -16,35 +16,18 @@ def create_payroll():
 
     if not data.is_valid():
         return jsonify({"error": "Missing Fields"}), 400
-
-    # try:
-    #     batch_name = data.get('batch_name', None)
-    #     staff_id = data.get('staff_id', 0)
-    #     basic_salary = data.get('basic_salary', 0)
-    #     hourly_rate = data.get('hourly_rate', 0)
-    #     monthly_hours = data.get('monthly_hours', 0)
-    #     worked_hours = data.get('worked_hours', 0)
-    #     late = data.get('late', 0)
-    #     leaves = data.get('leaves', 0)
-    #     early = data.get('early', 0)
-    #     bonus1 = data.get('bonus1', 0)
-    #     bonus2 = data.get('bonus2', 0)
-
-    #     if not all([batch_name, staff_id, basic_salary, hourly_rate, monthly_hours, worked_hours, late, leaves, early, bonus1, bonus2]):
-    #         return jsonify({
-    #             "error": "Missing Fields"
-    #         }), 400
         
-    #     exist_payroll = get_payroll_by_username(batch_name, staff_id)
-
-    #     if exist_payroll:
-    #         return jsonify({
-    #             "code": "Payroll_Already_Exist",
-    #             "message": f"This {batch_name} and {staff_id} is already exists, Please try another one"
-    #         })
+    exist_payroll = get_payroll_by_username(data.batch_name, data.staff_id)
+    
+    if exist_payroll:
+        app.logger.error("Payroll already exists.")
+        return jsonify({
+                "code": "EMPLOYEE_ALREADY_EXISTS",
+                "message": f"This {data.batch_name} and {data.staff_id} is already exists, Please try another one"
+        }), 403
         
     try:
-        new_payroll = create_payroll_crud (
+        new_payroll = create_payroll_crud(
             batch_name = data.batch_name,
             staff_id = data.staff_id,
             basic_salary = data.basic_salary,
@@ -57,25 +40,17 @@ def create_payroll():
             bonus1 = data.bonus1,
             bonus2 = data.bonus2
         )
-
+    
         return jsonify({
-            "code": "Payroll_Created",
-            "message": f"Payroll {data.batch_name} and {data.staff_id} Is Created Successfully"
-        })
-
+            "code": "Payroll_CREATED",
+            "data": PayrollResponse(new_payroll).to_dict()
+        }), 201
+    
     except IntegrityError as error:
-        print(f"Error: {error}")
-        return jsonify({
-            "CODE":"IntegrityError_ERROR_OCCURED",
-            "message":f"Integrity error occured for '{data.batch_name}' and ''{data.staff_id} creation, please try again {error}"
-        })
+        return jsonify({"code": "INTEGRITY_ERROR", "message": str(error)}), 409
 
-    except Exception as error:
-        print(f"Error: {error}")
-        return jsonify({
-            "CODE":"EXCEPTIONAL_ERROR_OCCURED",
-            "message":f"Exceptional error occured for '{data.batch_name}' and ''{data.staff_id} creation, please try again"
-        })
+    except Exception:
+        return jsonify({"code": "ERROR"}), 500
 
 
 

@@ -1,7 +1,7 @@
 from flask import Flask
 from database import init_db
 from flask_cors import CORS
-import logging
+from config import Config
 
 from controller.employee_create import create_bp
 from controller.employee_update import update_bp
@@ -13,33 +13,46 @@ from controller.payroll_update import payroll_update_bp
 from controller.payroll_delete import payroll_delete_bp
 from controller.payroll_get import payroll_get_bp
 
-app = Flask (__name__)
-CORS(app)
-app.logger.setLevel(logging.INFO)
-
 # Point SQLAlchemy to your SQLite database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:iqbal123123@localhost:5432/myimab'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:iqbal123123@localhost:5432/'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Initialize DB
-init_db(app)
+def create_app():
+    app = Flask(__name__)
 
-# Register Employee blueprints
-app.register_blueprint(create_bp)
-app.register_blueprint(update_bp)
-app.register_blueprint(delete_bp)
-app.register_blueprint(get_bp)
+    # Load configuration
+    app.config.from_object(Config)
 
-#Register Payroll Blueprints
-app.register_blueprint(payroll_create_bp)
-app.register_blueprint(payroll_update_bp)
-app.register_blueprint(payroll_delete_bp)
-app.register_blueprint(payroll_get_bp)
+    # CORS
+    CORS(app)
+
+    # Logging
+    app.logger.setLevel(app.config["LOG_LEVEL"])
+    app.logger.info("Test")
+
+    # Initialize DB
+    init_db(app)
+
+    # Register Employee blueprints
+    app.register_blueprint(create_bp)
+    app.register_blueprint(update_bp)
+    app.register_blueprint(delete_bp)
+    app.register_blueprint(get_bp)
+
+    #Register Payroll Blueprints
+    app.register_blueprint(payroll_create_bp)
+    app.register_blueprint(payroll_update_bp)
+    app.register_blueprint(payroll_delete_bp)
+    app.register_blueprint(payroll_get_bp)
 
 
-@app.route("/")
-def index():
-    return "Wellcome To Flask"
+    @app.route("/")
+    def index():
+        return "Wellcome To Flask"
+    
+    return app
+
+app = create_app()
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=Config.DEBUG)

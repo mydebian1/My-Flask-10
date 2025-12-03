@@ -1,6 +1,8 @@
 from flask import Blueprint, Flask, request, jsonify
 from crud.payroll_update import update_payroll_crud
+from utils.utils import get_payroll_by_username
 from sqlalchemy.exc import IntegrityError
+from schemas.payroll import UpdatePayrollRequest, PayrollResponse
 
 payroll_update_bp = Blueprint("payroll_update_bp", __name__, url_prefix="/payroll")
 
@@ -8,57 +10,50 @@ app = Flask(__name__)
 
 @payroll_update_bp.route("/update", methods=["PUT"])
 def update_payroll():
-    data = request.json
+
+    data = UpdatePayrollRequest(request.json)
     app.logger.info(f"Data: {data}")
 
-    try:
-        current_batch_name = data.get("current_batch_name")
-        current_staff_id = data.get("current_staff_id")
-        batch_name = data.get("batch_name")
-        staff_id = data.get("staff_id")
-        basic_salary = data.get("basic_salary")
-        hourly_rate = data.get("hourly_rate")
-        monthly_hours = data.get("monthly_hours")
-        worked_hours = data.get("worked_hours")
-        late = data.get("late")
-        leaves = data.get("leaves")
-        early = data.get("early")
-        bonus1 = data.get("bonus1")
-        bonus2 = data.get("bonus2")
 
-        if not batch_name or not staff_id:
-            return jsonify ({
-                "code": "No_Data_Found",
-                "message": "Batch Name And Staff ID Are Required"
-            })
-        
-        try:
-            payroll = update_payroll_crud(current_batch_name=current_batch_name, current_staff_id=current_staff_id, batch_name=batch_name, staff_id=staff_id, basic_salary=basic_salary, hourly_rate=hourly_rate, monthly_hours=monthly_hours, worked_hours=worked_hours, late=late, leaves=leaves, early=early, bonus1=bonus1, bonus2=bonus2)
+    if not data.has_batch_name() or not data.staff_id:
+        return jsonify({
+            "code": "ESSENTIALS_REQUIRED", 
+            "error": "Batch Name And Staff ID Are Required"
+        }), 400
 
-            if not payroll:
-                return jsonify ({
-                    "code": "Payroll_Not_Exist",
-                    "message": f"Please Provide The Correct {current_batch_name} and {current_staff_id}"
-                })
-            
-        except IntegrityError as error:
-            app.logger.error(f"Integrity Error Occured: {error}")
-            return jsonify({
-                "CODE":"Integrity_ERROR_OCCURED",
-                "message":f"Integrity error occured for '{current_batch_name}' And '{current_staff_id}' creation, please try again {error}"
-        })
-
-        if payroll:
-            return jsonify ({
-                "code": "Payroll_Updated",
-                "message": f"Payroll {current_batch_name} And {current_staff_id} Is Updated!"
-            })
+    if not data.has_any_updates():
+        return jsonify({
+            "code": "DATA_MISSING", 
+            "error": "Required fields for data update not provided"
+            }), 400
     
-    except Exception as error:
-        app.logger.error(f"Exceptional Error Occured: {error}")
+    payroll = get_payroll_by_username(data.batch_name, data.staff_id)
+
+    if not payroll:
+        return jsonify({
+            "code": "EMPLOYEE_NOT_FOUND", 
+            "error": "Required fields for data update not provided"
+        }), 404
+
+    try:
+        updated_payroll = update_payroll_crud(batch_name=data.batch_name, staff_id=data.staff_id, basic_salary=data.basic_salary, hourly_rate=data.hourly_rate, monthly_hours=data.monthly_hours, worked_hours=data.worked_hours, late=data.late, leaves=data.leaves, early=data.early, bonus1=data.bonus1, bonus2=data.bonus2)
+
+        return jsonify({
+            "code": "Payroll_Updated",
+            "data": PayrollResponse(updated_payroll).to_dict()
+        }), 403
+           
+    except IntegrityError as error:
+        app.logger.error(f"Integrity Error Occured: {error}")
+        return jsonify({
+            "CODE":"Integrity_ERROR_OCCURED",
+            "message":f"Integrity error occured for '{data.batch_name}' and '{data.staff_id}' updation, please try again {error}"
+        })
+        
+    except Exception:
         return jsonify({
             "CODE":"EXCEPTIONAL_ERROR_OCCURED",
-            "message":f"Exceptional error occured for '{current_batch_name}' And '{current_staff_id}' creation, please try again"
+            "message":f"Exceptional error occured for '{data.batch_name}' and '{data.staff_id}' updation, please try again"
         })
     
     

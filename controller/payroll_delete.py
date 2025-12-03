@@ -2,6 +2,7 @@ from flask import Blueprint, Flask, request, jsonify
 from crud.payroll_delete import delete_payroll_crud
 from utils.utils import get_payroll_by_username
 from sqlalchemy.exc import IntegrityError
+from schemas.payroll import DeletePayrollRequest
 
 payroll_delete_bp = Blueprint("payroll_delete_bp", __name__, url_prefix="/payroll")
 
@@ -9,11 +10,61 @@ app = Flask (__name__)
 
 @payroll_delete_bp.route("/delete", methods=["POST"])
 def delete_payroll():
-    data = request.json
+
+    data = DeletePayrollRequest(request.json)
     app.logger.info(f"Data: {data}")
 
-    staff_id = data.get("staff_id")
-    batch_name = data.get("batch_name")
+    if not data.is_valid():
+        return jsonify({"error": "Batch Name and Staff ID Are Required"}), 400
+    
+    
+    payroll = get_payroll_by_username(data.batch_name, data.staff_id)
+
+    if not payroll:
+        return jsonify({
+            "code": "Payroll_Desn't_Exist", 
+            "message": f"Payroll Doesn't Exist. Please Enter Your Valid Batch Name '{data.batch_name}' And Staff ID '{data.staff_id}' "
+        }), 404
+    
+    
+    try:
+        delete_query = delete_payroll_crud(batch_name=data.batch_name, staff_id=data.staff_id)
+
+        if delete_query:
+            return jsonify({
+                "CODE": "Payroll_DELETED",
+                "message": f"Payroll '{data.batch_name}' and '{data.staff_id}' are deleted"
+            }), 200
+        
+    except IntegrityError as error:
+        app.logger.error(f"Integrity Error Occured: {error}")
+        return jsonify({
+            "CODE":"Integrity_ERROR_OCCURED",
+            "message":f"Integrity error occured for '{data.batch_name}' and '{data.staff_id}' updation, please try again {error}"
+        })
+        
+    except Exception:
+        return jsonify({
+            "CODE":"EXCEPTIONAL_ERROR_OCCURED",
+            "message":f"Exceptional error occured for '{data.batch_name}' and '{data.staff_id}' updation, please try again"
+        })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     try:
         if not staff_id or not batch_name: 

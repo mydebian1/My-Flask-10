@@ -1,6 +1,7 @@
 from flask import Blueprint, Flask, request, jsonify
 from crud.payroll_get import get_payroll_by_username, get_all_payroll_crud
 from models import Employee
+from schemas.payroll import PayrollResponse, PayrollListResponse
 
 payroll_get_bp = Blueprint("payroll_get_bp", __name__, url_prefix="/payroll")
 
@@ -11,6 +12,7 @@ def get_payroll_username():
 
     data = request.json
     app.logger.info(f"Data: {data}")
+
     batch_name = data.get("batch_name")
     staff_id = data.get("staff_id")
 
@@ -25,7 +27,7 @@ def get_payroll_username():
 
     try:
         if payroll:
-            return payroll.to_dict()
+            return PayrollResponse(payroll).to_dict()
         
         else: 
             return {
@@ -50,12 +52,12 @@ def get_all_payroll_controller():
         get_all_payroll =  get_all_payroll_crud()
 
         if get_all_payroll:
-            return Employee.to_dict_list(get_all_payroll)
+            return PayrollListResponse.build(get_all_payroll)
         
         else:
             return {
                 "code": "NO_PAYROLL_FOUND",
-                "message": "No Payroll exist"
+                "message": "No Payroll Exist. Please Add Payroll Earlier"
             }, 403
             
     except Exception as e:
