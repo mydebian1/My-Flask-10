@@ -33,7 +33,7 @@ def create_app():
     # Initialize DB
     init_db(app)
 
-    # Register Employee blueprints
+    # Register EmplFLASK_ENVoyee blueprints
     app.register_blueprint(create_bp)
     app.register_blueprint(update_bp)
     app.register_blueprint(delete_bp)
