@@ -12,11 +12,13 @@ app.logger.setLevel(logging.INFO)
 
 @create_bp.route("/create", methods=["POST"])
 def create_employee():
-    data = CreateEmployeeRequest(request.json)
-    app.logger.info(f"data: {data}")
 
-    if not data.is_valid():
-        return jsonify({"error": "Missing fields"}), 400
+    data = CreateEmployeeRequest(request.json)
+    valid, message = data.is_valid()
+
+    if not valid:
+        app.logger.error(f"Schema error. {message}")
+        return jsonify({"error": f"Schema error. {message}"}), 400
     
     employee_by_username = get_employee_by_username(data.username)
 

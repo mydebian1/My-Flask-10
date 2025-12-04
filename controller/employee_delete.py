@@ -10,11 +10,13 @@ app = Flask (__name__)
 
 @delete_bp.route("/delete", methods=["POST"])
 def delete_employee():
-    data = DeleteEmployeeRequest(request.json)
-    app.logger.info(f"Data: {data}")
 
-    if not data.is_valid():
-        return jsonify({"error": "Username required"}), 400
+    data = DeleteEmployeeRequest(request.json)
+    valid, message = data.is_valid()
+
+    if not valid:
+        app.logger.error(f"Schema error. {message}")
+        return jsonify({"error": f"Schema error. {message}"}), 400
     
     username = get_employee_by_username(data.username)
 

@@ -12,11 +12,11 @@ app = Flask (__name__)
 def delete_payroll():
 
     data = DeletePayrollRequest(request.json)
-    app.logger.info(f"Data: {data}")
+    valid, message = data.is_valid()
 
-    if not data.is_valid():
-        return jsonify({"error": "Batch Name and Staff ID Are Required"}), 400
-    
+    if not valid:
+        app.logger.error(f"Schema error. {message}")
+        return jsonify({"error": f"Schema error. {message}"}), 400
     
     payroll = get_payroll_by_username(data.batch_name, data.staff_id)
 
@@ -28,7 +28,7 @@ def delete_payroll():
     
     
     try:
-        delete_query = delete_payroll_crud(batch_name=data.batch_name, staff_id=data.staff_id)
+        delete_query = get_payroll_by_username(batch_name=data.batch_name, staff_id=data.staff_id)
 
         if delete_query:
             return jsonify({

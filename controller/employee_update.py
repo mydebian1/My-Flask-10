@@ -10,14 +10,13 @@ app = Flask(__name__)
 
 @update_bp.route("/update", methods=["PUT"])
 def update_employee():
-    data = UpdateEmployeeRequest(request.json)
-    app.logger.info(f"Data: {data}")
 
-    if not data.has_username():
-        return jsonify({
-            "code": "USERNAME_REQUIRED", 
-            "error": "Username Required"
-            }), 400
+    data = UpdateEmployeeRequest(request.json)
+    valid, message = data.is_valid()
+
+    if not valid:
+        app.logger.error(f"Schema error. {message}")
+        return jsonify({"error": f"Schema error. {message}"}), 400
 
     if not data.has_any_updates():
         return jsonify({

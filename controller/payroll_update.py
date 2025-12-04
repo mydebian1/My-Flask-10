@@ -12,15 +12,12 @@ app = Flask(__name__)
 def update_payroll():
 
     data = UpdatePayrollRequest(request.json)
-    app.logger.info(f"Data: {data}")
+    valid, message = data.is_valid()
 
-
-    if not data.has_batch_name() or not data.staff_id:
-        return jsonify({
-            "code": "ESSENTIALS_REQUIRED", 
-            "error": "Batch Name And Staff ID Are Required"
-        }), 400
-
+    if not valid:
+        app.logger.error(f"Schema error. {message}")
+        return jsonify({"error": f"Schema error. {message}"}), 400
+    
     if not data.has_any_updates():
         return jsonify({
             "code": "DATA_MISSING", 
