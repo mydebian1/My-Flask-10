@@ -16,6 +16,21 @@ class CreatePayrollRequest:
         # Required fields
         if not all([self.batch_name, self.staff_id, self.basic_salary, self.hourly_rate, self.monthly_hours, self.worked_hours, self.late, self.leaves, self.early, self.bonus1, self.bonus2]):
             return False, "Missing Required Fields"
+
+        if self.late < 0:
+            return False, f"{self.late} Cannot Be Negative"
+
+        if self.leaves < 0:
+            return False, f"{self.leaves} Cannot Be Negative"
+        
+        if self.early < 0:
+            return False, f"{self.early} Cannot Be Negative"
+        
+        if self.bonus1 < 0:
+            return False, f"{self.bonus1} Cannot Be Negative"
+        
+        if self.bonus2 < 0:
+            return False, f"{self.bonus2} Cannot Be Negative"
         
         return True, None
         
@@ -41,6 +56,21 @@ class UpdatePayrollRequest:
         
         if not self.staff_id:
             return False, "Staff id is not provided"
+        
+        if self.late < 0:
+            return False, f"{self.late} Cannot Be Negative"
+
+        if self.leaves < 0:
+            return False, f"{self.leaves} Cannot Be Negative"
+        
+        if self.early < 0:
+            return False, f"{self.early} Cannot Be Negative"
+        
+        if self.bonus1 < 0:
+            return False, f"{self.bonus1} Cannot Be Negative"
+        
+        if self.bonus2 < 0:
+            return False, f"{self.bonus2} Cannot Be Negative"
         
         return True, None
         
