@@ -2,7 +2,8 @@ from flask import Flask, Blueprint, request, jsonify
 from crud.employee_create import create_employee_crud
 from utils.utils import get_employee_by_username
 from sqlalchemy.exc import IntegrityError
-from schemas.employee import CreateEmployeeRequest, EmployeeResponse, EmployeeListResponse
+from schemas.employee import CreateEmployeeRequest, EmployeeResponse
+from auth import require_auth
 import logging
 
 create_bp = Blueprint("create_bp", __name__, url_prefix="/employee")
@@ -11,6 +12,7 @@ app = Flask (__name__)
 app.logger.setLevel(logging.INFO)
 
 @create_bp.route("/create", methods=["POST"])
+@require_auth
 def create_employee():
 
     data = CreateEmployeeRequest(request.json)
@@ -19,6 +21,7 @@ def create_employee():
     if not valid:
         app.logger.error(f"Schema error. {message}")
         return jsonify({"error": f"Schema error. {message}"}), 400
+
     
     employee_by_username = get_employee_by_username(data.username)
 
@@ -38,6 +41,7 @@ def create_employee():
             role = data.role
         )
     
+       
         return jsonify({
             "code": "EMPLOYEE_CREATED",
             "data": EmployeeResponse(new_employee).to_dict()

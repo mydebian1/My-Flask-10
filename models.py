@@ -53,7 +53,7 @@ class Payroll(BaseModel):
     leaves = db.Column(db.Integer, nullable=False)
     early = db.Column(db.Integer, nullable=False)
     bonus1 = db.Column(db.Integer, nullable=False)
-    bonus2 = db.Column(db.Integer, nullable=False)
+    bonus2 = db.Column(db.Integer, nullable=False) 
 
     __table_args__ = (
         UniqueConstraint("staff_id", "batch_name", name="unique_payroll_emp_batch_name"),
