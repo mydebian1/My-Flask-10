@@ -30,10 +30,9 @@ class Employee(BaseModel):
             "id": self.id,
             "name": self.name,
             "email": self.email,
-
             "username": self.username,
             "password": self.password,
-            "role": self.role
+            "role": self.role.value
         }
     
     @classmethod
