@@ -94,7 +94,21 @@ class EmployeeResponse:
             "username": self.username,
             "role": self.role
         }
+    
+class EmployeeShortResponse:
+    def __init__(self, employee):
+        self.id = employee.id
+        self.name = employee.name
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name
+        }
+    
+    @staticmethod
+    def from_list(employees):
+        return [EmployeeShortResponse(emp).to_dict() for emp in employees]
 
 class EmployeeListResponse:
     @staticmethod

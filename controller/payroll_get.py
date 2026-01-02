@@ -1,6 +1,5 @@
 from flask import Blueprint, Flask, request, jsonify
 from crud.payroll_get import get_payroll_by_username, get_all_payroll_crud
-from models import Employee
 from schemas.payroll import PayrollResponse, PayrollListResponse
 
 payroll_get_bp = Blueprint("payroll_get_bp", __name__, url_prefix="/payroll")

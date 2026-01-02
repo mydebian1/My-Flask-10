@@ -13,6 +13,8 @@ from controller.payroll_update import payroll_update_bp
 from controller.payroll_delete import payroll_delete_bp
 from controller.payroll_get import payroll_get_bp
 
+from controller.login import login_bp
+
 # Point SQLAlchemy to your SQLite database
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:iqbal123123@localhost:5432/'
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -45,6 +47,7 @@ def create_app():
     app.register_blueprint(payroll_delete_bp)
     app.register_blueprint(payroll_get_bp)
 
+    app.register_blueprint(login_bp)
 
     @app.route("/")
     def index():

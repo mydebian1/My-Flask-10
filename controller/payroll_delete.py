@@ -25,7 +25,7 @@ def delete_payroll():
             "code": "Payroll_Desn't_Exist", 
             "message": f"Payroll Doesn't Exist. Please Enter Your Valid Batch Name '{data.batch_name}' And Staff ID '{data.staff_id}' "
         }), 404
-    
+
     
     try:
         delete_query = get_payroll_by_username(batch_name=data.batch_name, staff_id=data.staff_id)
@@ -48,59 +48,4 @@ def delete_payroll():
             "CODE":"EXCEPTIONAL_ERROR_OCCURED",
             "message":f"Exceptional error occured for '{data.batch_name}' and '{data.staff_id}' updation, please try again"
         })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    try:
-        if not staff_id or not batch_name: 
-            return jsonify({
-                "code": "Data_Missing",
-                "message": f"Your {batch_name} And {staff_id} Are Required"
-            })
     
-        exist_payroll = get_payroll_by_username(batch_name, staff_id)
-
-        if not exist_payroll:
-            return jsonify({
-                    "code": "Payroll_NOT_EXIST",
-                    "message": f"This {batch_name} and {staff_id} is not exists, please try another one"
-                })
-
-        try:
-            delete = delete_payroll_crud(batch_name=batch_name, staff_id=staff_id)
-
-        except IntegrityError as error:
-            print(f"error: {error}")
-            return jsonify({
-                "code": "Integrity_Error",
-                "message": f"Integrity Error occured for Payroll {batch_name} And {staff_id} deletion {error}"
-            })
-        
-        if delete:
-            return jsonify({
-                "code": "Payroll_Deleted",
-                "message": f"Payroll {batch_name} And {staff_id} Are Deleted Successfully"
-            })
-        
-    except Exception as error:
-        print(f"error: {error}")
-        return jsonify({
-            "code": "EXCEPTION",
-            "message": f"Exception Error occured for Payroll {batch_name} And {staff_id} deletion!"
-        })
-

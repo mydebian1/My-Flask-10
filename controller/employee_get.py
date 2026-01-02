@@ -1,13 +1,14 @@
 from flask import Blueprint, Flask, request, jsonify
-from crud.employee_get import get_employee_by_username, get_all_employee_crud
-from models import Employee
-from schemas.employee import EmployeeResponse, EmployeeListResponse
+from crud.employee_get import get_employee_by_username, get_all_employee_crud, get_short_employee_crud
+from schemas.employee import EmployeeResponse, EmployeeListResponse, EmployeeShortResponse
+from auth import require_auth
 
 get_bp = Blueprint("get_bp", __name__, url_prefix="/employee")
 
 app = Flask (__name__)
 
 @get_bp.route("/byusername", methods = ["GET"])
+@require_auth
 def get_employee_username():
 
     data = request.json
@@ -44,6 +45,7 @@ def get_employee_username():
     
 
 @get_bp.route("/all", methods = ["GET"])
+@require_auth
 def get_all_employees():
 
     print('Get All Employee Request Issue')
@@ -66,3 +68,29 @@ def get_all_employees():
             "code": "Exception_Error_Occured",
             "message": f"Exceptional Error Occured For All Employees, Please Try Again"
         }
+    
+@get_bp.route("/short", methods = ["GET"])
+@require_auth
+def get_short_employee():
+
+    try:
+        employees = get_short_employee_crud()
+
+        if employees:
+            return EmployeeShortResponse.from_list(employees)
+        
+        else:
+            return {
+                "code": "No_Short_Employees_Found",
+                "message": "Please Add The Employee Name First Then Search Here"
+            }, 403
+        
+    except Exception as e:
+        print(f"Error: {e}")
+        return {
+            "code": "Exception_Error_Occured",
+            "message": f"Exceptional Error Occured For Short Employees, Please Try Again"
+        }
+
+
+

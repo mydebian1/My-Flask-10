@@ -3,12 +3,14 @@ from utils.utils import get_employee_by_username
 from crud.employee_delete import delete_employee_crud
 from sqlalchemy.exc import IntegrityError
 from schemas.employee import DeleteEmployeeRequest
+from auth import require_auth
 
 delete_bp = Blueprint("delete_bp", __name__, url_prefix="/employee")
 
 app = Flask (__name__)
 
 @delete_bp.route("/delete", methods=["POST"])
+@require_auth
 def delete_employee():
 
     data = DeleteEmployeeRequest(request.json)
