@@ -1,12 +1,10 @@
-from flask import Blueprint, Flask, request, jsonify
+from flask import Blueprint, Flask, request, jsonify, current_app
 from crud.payroll_update import update_payroll_crud
 from utils.utils import get_payroll_by_username
 from sqlalchemy.exc import IntegrityError
 from schemas.payroll import UpdatePayrollRequest, PayrollResponse
 
 payroll_update_bp = Blueprint("payroll_update_bp", __name__, url_prefix="/payroll")
-
-app = Flask(__name__)
 
 @payroll_update_bp.route("/update", methods=["PUT"])
 def update_payroll():
@@ -15,7 +13,7 @@ def update_payroll():
     valid, message = data.is_valid()
 
     if not valid:
-        app.logger.error(f"Schema error. {message}")
+        current_app.logger.error(f"Schema error. {message}")
         return jsonify({"error": f"Schema error. {message}"}), 400
     
     if not data.has_any_updates():
@@ -41,13 +39,14 @@ def update_payroll():
         }), 403
            
     except IntegrityError as error:
-        app.logger.error(f"Integrity Error Occured: {error}")
+        current_app.logger.error(f"Integrity Error Occured: {error}")
         return jsonify({
             "CODE":"Integrity_ERROR_OCCURED",
             "message":f"Integrity error occured for '{data.batch_name}' and '{data.staff_id}' updation, please try again {error}"
         })
         
     except Exception:
+        current_app.logger.error(f"Exception Error Occured")
         return jsonify({
             "CODE":"EXCEPTIONAL_ERROR_OCCURED",
             "message":f"Exceptional error occured for '{data.batch_name}' and '{data.staff_id}' updation, please try again"

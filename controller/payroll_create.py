@@ -1,4 +1,4 @@
-from flask import Blueprint, Flask, request, jsonify
+from flask import Blueprint, Flask, request, jsonify, current_app
 from crud.payroll_create import create_payroll_crud
 from utils.utils import get_payroll_by_username
 from sqlalchemy.exc import IntegrityError
@@ -6,13 +6,12 @@ from schemas.payroll import CreatePayrollRequest, PayrollResponse
 
 payroll_create_bp = Blueprint("payroll_create_bp", __name__, url_prefix="/payroll")
 
-app = Flask(__name__)
 
 @payroll_create_bp.route('/create', methods = ["POST"])
 def create_payroll():
 
     data = CreatePayrollRequest(request.json)
-    app.logger.info(f"Data: {data}")
+    current_app.logger.info(f"Data: {data}")
 
     if not data.is_valid():
         return jsonify({"error": "Missing Fields"}), 400
@@ -20,7 +19,7 @@ def create_payroll():
     exist_payroll = get_payroll_by_username(data.batch_name, data.staff_id)
     
     if exist_payroll:
-        app.logger.error("Payroll already exists.")
+        current_app.logger.error("Payroll Already Exists")
         return jsonify({
                 "code": "EMPLOYEE_ALREADY_EXISTS",
                 "message": f"This {data.batch_name} and {data.staff_id} is already exists, Please try another one"
@@ -47,9 +46,11 @@ def create_payroll():
         }), 201
     
     except IntegrityError as error:
+        current_app.logger.error(f"Integrity Error {error}")
         return jsonify({"code": "INTEGRITY_ERROR", "message": str(error)}), 409
 
     except Exception:
+        current_app.logger.error("Exception Error")
         return jsonify({"code": "ERROR"}), 500
 
 

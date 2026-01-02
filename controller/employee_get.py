@@ -1,28 +1,29 @@
-from flask import Blueprint, Flask, request, jsonify
+from flask import Blueprint, Flask, request, jsonify, current_app
 from crud.employee_get import get_employee_by_username, get_all_employee_crud, get_short_employee_crud
 from schemas.employee import EmployeeResponse, EmployeeListResponse, EmployeeShortResponse
 from auth import require_auth
 
 get_bp = Blueprint("get_bp", __name__, url_prefix="/employee")
 
-app = Flask (__name__)
 
 @get_bp.route("/byusername", methods = ["GET"])
 @require_auth
 def get_employee_username():
 
     data = request.json
-    app.logger.info(f"Data: {data}")
+    current_app.logger.info(f"Data: {data}")
 
     username = data.get("username")
 
     if not username:
+        current_app.logger.error(f"Error {username}")
+
         return jsonify({
             "Code":"No_Username_Data",
             "message":"Please Enter Your Username"
         }), 403
         
-    
+
     employee = get_employee_by_username(username=username)
     print(f"employee:{employee}")
 
@@ -37,7 +38,7 @@ def get_employee_username():
             }), 403
             
     except Exception as error:
-        print(f"error:{error}")
+        current_app.logger.error(f"Error {error}")
         return jsonify({
             "code":"Exceptional_Error_Occured",
             "message":f"Exceptional Error Occured For Getting Employee '{username}', Please Try Again"
@@ -63,7 +64,7 @@ def get_all_employees():
             }, 403
             
     except Exception as e:
-        print(f"Error: {e}")
+        current_app.logger.error(f"Exception Error {e}")
         return {
             "code": "Exception_Error_Occured",
             "message": f"Exceptional Error Occured For All Employees, Please Try Again"
@@ -86,7 +87,7 @@ def get_short_employee():
             }, 403
         
     except Exception as e:
-        print(f"Error: {e}")
+        current_app.logger.error(f"Exception Error {e}")
         return {
             "code": "Exception_Error_Occured",
             "message": f"Exceptional Error Occured For Short Employees, Please Try Again"

@@ -1,4 +1,4 @@
-from flask import Blueprint, Flask, request, jsonify
+from flask import Blueprint, Flask, request, jsonify, current_app
 from crud.payroll_delete import delete_payroll_crud
 from utils.utils import get_payroll_by_username
 from sqlalchemy.exc import IntegrityError
@@ -6,7 +6,6 @@ from schemas.payroll import DeletePayrollRequest
 
 payroll_delete_bp = Blueprint("payroll_delete_bp", __name__, url_prefix="/payroll")
 
-app = Flask (__name__)
 
 @payroll_delete_bp.route("/delete", methods=["POST"])
 def delete_payroll():
@@ -15,12 +14,13 @@ def delete_payroll():
     valid, message = data.is_valid()
 
     if not valid:
-        app.logger.error(f"Schema error. {message}")
+        current_app.logger.error(f"Schema error. {message}")
         return jsonify({"error": f"Schema error. {message}"}), 400
     
     payroll = get_payroll_by_username(data.batch_name, data.staff_id)
 
     if not payroll:
+        current_app.logger.error(f"Payroll Error. {payroll}")
         return jsonify({
             "code": "Payroll_Desn't_Exist", 
             "message": f"Payroll Doesn't Exist. Please Enter Your Valid Batch Name '{data.batch_name}' And Staff ID '{data.staff_id}' "
@@ -37,13 +37,14 @@ def delete_payroll():
             }), 200
         
     except IntegrityError as error:
-        app.logger.error(f"Integrity Error Occured: {error}")
+        current_app.logger.error(f"Integrity Error Occured: {error}")
         return jsonify({
             "CODE":"Integrity_ERROR_OCCURED",
             "message":f"Integrity error occured for '{data.batch_name}' and '{data.staff_id}' updation, please try again {error}"
         })
         
     except Exception:
+        current_app.logger.error("Exception Error Occured")
         return jsonify({
             "CODE":"EXCEPTIONAL_ERROR_OCCURED",
             "message":f"Exceptional error occured for '{data.batch_name}' and '{data.staff_id}' updation, please try again"

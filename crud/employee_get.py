@@ -40,7 +40,7 @@ def get_short_employee_crud():
     
     except IntegrityError as error:
         print(f"error: {error}")
-        return error
+        raise error
     
     except Exception as error:
-        return error
+        raise error

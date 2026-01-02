@@ -1,21 +1,21 @@
-from flask import Blueprint, Flask, request, jsonify
+from flask import Blueprint, Flask, request, jsonify, current_app
 from crud.payroll_get import get_payroll_by_username, get_all_payroll_crud
 from schemas.payroll import PayrollResponse, PayrollListResponse
 
 payroll_get_bp = Blueprint("payroll_get_bp", __name__, url_prefix="/payroll")
 
-app = Flask(__name__)
 
 @payroll_get_bp.route("/byusername", methods = ["GET"])
 def get_payroll_username():
 
     data = request.json
-    app.logger.info(f"Data: {data}")
+    current_app.logger.info(f"Data: {data}")
 
     batch_name = data.get("batch_name")
     staff_id = data.get("staff_id")
 
     if not batch_name or not staff_id:
+        current_app.logger.error(f"Error {batch_name} And {staff_id}")
         return jsonify({
             "code": "Data_Missing",
             "Message": f"No {batch_name} And {staff_id} Are Provided"
@@ -35,7 +35,7 @@ def get_payroll_username():
             }, 403
         
     except Exception as error:
-        print(f"error:{error}")
+        current_app.logger.error(f"Exception Error {error}")
         return jsonify({
             "code":"Exceptional_Error_Occured",
             "message":f"Exceptional Error Occured For Getting Payroll '{batch_name}' And '{staff_id}', Please Try Again"
@@ -45,7 +45,7 @@ def get_payroll_username():
 @payroll_get_bp.route("/all", methods = ["GET"])
 def get_all_payroll_controller():
 
-    print('Get All Payroll Request Issue')
+    current_app.logger.error('Get All Payroll Request Issue')
 
     try:
         get_all_payroll =  get_all_payroll_crud()
@@ -60,7 +60,7 @@ def get_all_payroll_controller():
             }, 403
             
     except Exception as e:
-        print(f"Error: {e}")
+        current_app.logger.error(f"Exception Error {e}")
         return {
             "code": "EXCEPTION",
             "message": f"Exception Error Occured For Payroll Deletion!"

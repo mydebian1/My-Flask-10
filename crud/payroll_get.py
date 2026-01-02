@@ -22,4 +22,4 @@ def get_all_payroll_crud():
     
     except Exception as error:
         print(f"error: {error}")
-        return error
+        raise error

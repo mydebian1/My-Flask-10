@@ -1,15 +1,15 @@
-from flask import Flask, Blueprint, request, jsonify
+from flask import Flask, Blueprint, request, jsonify, current_app
 from crud.employee_create import create_employee_crud
 from utils.utils import get_employee_by_username
 from sqlalchemy.exc import IntegrityError
 from schemas.employee import CreateEmployeeRequest, EmployeeResponse
 from auth import require_auth
-import logging
+# import logging
 
 create_bp = Blueprint("create_bp", __name__, url_prefix="/employee")
 
-app = Flask (__name__)
-app.logger.setLevel(logging.INFO)
+# app = Flask (__name__)
+# app.logger.setLevel(logging.INFO)
 
 @create_bp.route("/create", methods=["POST"])
 @require_auth
@@ -19,14 +19,14 @@ def create_employee():
     valid, message = data.is_valid()
 
     if not valid:
-        app.logger.error(f"Schema error. {message}")
+        current_app.logger.error(f"Schema error. {message}")
         return jsonify({"error": f"Schema error. {message}"}), 400
 
     
     employee_by_username = get_employee_by_username(data.username)
 
     if employee_by_username:
-        app.logger.error("Employee already exists.")
+        current_app.logger.error("Employee Already Exists")
         return jsonify({
                 "code": "EMPLOYEE_ALREADY_EXISTS",
                 "message": f"This username {data.username} already exists, try a new one"
@@ -40,7 +40,7 @@ def create_employee():
             password = data.password,
             role = data.role
         )
-    
+
        
         return jsonify({
             "code": "EMPLOYEE_CREATED",
@@ -48,9 +48,11 @@ def create_employee():
         }), 201
 
     except IntegrityError as e:
+        current_app.logger.error(f"Integrity Error {e}")
         return jsonify({"code": "INTEGRITY_ERROR", "message": str(e)}), 409
 
     except Exception:
+        current_app.logger.error("Exception Error")
         return jsonify({"code": "ERROR"}), 500
     
 

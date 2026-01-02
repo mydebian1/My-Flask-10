@@ -13,7 +13,7 @@ from controller.payroll_update import payroll_update_bp
 from controller.payroll_delete import payroll_delete_bp
 from controller.payroll_get import payroll_get_bp
 
-from controller.login import login_bp
+from controller.login import login_bp 
 
 # Point SQLAlchemy to your SQLite database
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:iqbal123123@localhost:5432/'
@@ -30,7 +30,6 @@ def create_app():
 
     # Logging
     app.logger.setLevel(app.config["LOG_LEVEL"])
-    app.logger.info("test")
 
     # Initialize DB
     init_db(app)
