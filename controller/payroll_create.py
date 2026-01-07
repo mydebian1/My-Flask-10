@@ -3,11 +3,13 @@ from crud.payroll_create import create_payroll_crud
 from utils.utils import get_payroll_by_username
 from sqlalchemy.exc import IntegrityError
 from schemas.payroll import CreatePayrollRequest, PayrollResponse
+from auth import require_auth
 
 payroll_create_bp = Blueprint("payroll_create_bp", __name__, url_prefix="/payroll")
 
 
 @payroll_create_bp.route('/create', methods = ["POST"])
+@require_auth
 def create_payroll():
 
     data = CreatePayrollRequest(request.json)
@@ -21,8 +23,8 @@ def create_payroll():
     if exist_payroll:
         current_app.logger.error("Payroll Already Exists")
         return jsonify({
-                "code": "EMPLOYEE_ALREADY_EXISTS",
-                "message": f"This {data.batch_name} and {data.staff_id} is already exists, Please try another one"
+                "code": "PAYROLL_ALREADY_EXISTS",
+                "message": f"This Batch Name {data.batch_name} and Staff ID {data.staff_id} is already exists, Please try another one"
         }), 403
         
     try:

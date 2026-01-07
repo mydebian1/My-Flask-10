@@ -46,7 +46,7 @@ def require_auth(f):
         try:
             token = auth_header.split(' ')[1]
         except IndexError:
-            current_app.logger.error(f"Index error {IndexError}.")
+            current_app.logger.error(f"Index Error {IndexError}.")
             return jsonify({
                 "code": "INVALID_TOKEN_FORMAT",
                 "message": "Token format is invalid. Use Bearer <token>"

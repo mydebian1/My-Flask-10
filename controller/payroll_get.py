@@ -1,11 +1,13 @@
 from flask import Blueprint, Flask, request, jsonify, current_app
 from crud.payroll_get import get_payroll_by_username, get_all_payroll_crud
 from schemas.payroll import PayrollResponse, PayrollListResponse
+from auth import require_auth
 
 payroll_get_bp = Blueprint("payroll_get_bp", __name__, url_prefix="/payroll")
 
 
 @payroll_get_bp.route("/byusername", methods = ["GET"])
+@require_auth
 def get_payroll_username():
 
     data = request.json
@@ -43,6 +45,7 @@ def get_payroll_username():
     
 
 @payroll_get_bp.route("/all", methods = ["GET"])
+@require_auth
 def get_all_payroll_controller():
 
     current_app.logger.error('Get All Payroll Request Issue')

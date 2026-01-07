@@ -41,7 +41,6 @@ def create_employee():
             role = data.role
         )
 
-       
         return jsonify({
             "code": "EMPLOYEE_CREATED",
             "data": EmployeeResponse(new_employee).to_dict()
@@ -54,7 +53,3 @@ def create_employee():
     except Exception:
         current_app.logger.error("Exception Error")
         return jsonify({"code": "ERROR"}), 500
-    
-
-
-   

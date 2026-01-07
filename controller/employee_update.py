@@ -9,7 +9,7 @@ update_bp = Blueprint("update_bp", __name__, url_prefix="/employee")
 # app = Flask(__name__)
 
 @update_bp.route("/update", methods=["PUT"])
-def update_employee():
+def update_require_authemployee():
 
     data = UpdateEmployeeRequest(request.json)
     valid, message = data.is_valid()

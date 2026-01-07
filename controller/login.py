@@ -3,12 +3,14 @@ from crud.login import verify_login
 from schemas.login import LoginRequest, LoginResponse
 from auth import generate_token
 from sqlalchemy.exc import IntegrityError
+from auth import require_auth
 
 #Create blueprint for login
 login_bp = Blueprint("login_bp", __name__)
 
 #Login
 @login_bp.route("/login", methods=["POST"])
+@require_auth
 def login():
     data = LoginRequest(request.json)
     valid, message = data.is_valid()
